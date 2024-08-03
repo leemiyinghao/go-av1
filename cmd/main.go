@@ -103,7 +103,6 @@ func main() {
 
 func execute(input chan *convert.Task, output chan Result) {
 	for true {
-		<-input
 		task := <-input
 		if err := task.Convert(); err != nil {
 			output <- Result{task, err}
