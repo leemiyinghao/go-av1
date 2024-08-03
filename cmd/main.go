@@ -12,7 +12,6 @@ import (
 	"github.com/leemiyinghao/go-av1/pkg/test_av1"
 )
 
-
 func main() {
 	args := os.Args[1:]
 	var path string
@@ -28,7 +27,7 @@ func main() {
 	var tasks []*convert.Task
 	inputs := make(chan *convert.Task)
 	fileTypeChecker, err := regexp.Compile(`.*\.(mp4|mkv|m4v|avi)`)
-	if err != nil{
+	if err != nil {
 		panic("Regex compile failed.")
 	}
 	err = filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
@@ -40,7 +39,6 @@ func main() {
 			return nil
 		}
 
-		
 		skip, err := test_av1.Is_av1(ctx, path)
 		if skip {
 			log.Printf("Skip %s", path)
@@ -87,7 +85,7 @@ func main() {
 
 func execute(input chan *convert.Task, output chan error) {
 	for true {
-		<- input
+		<-input
 		task := <-input
 		if err := task.Convert(); err != nil {
 			output <- err
