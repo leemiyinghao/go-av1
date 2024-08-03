@@ -1,12 +1,12 @@
 package convert
 
 import (
+	"crypto/md5"
 	"fmt"
 	"io"
 	"log"
 	"os"
 	"path"
-	"crypto/md5"
 
 	"github.com/u2takey/ffmpeg-go"
 )
@@ -14,6 +14,7 @@ import (
 type Task struct {
 	oriFilePath string
 	newFilePath string
+	replaced    bool
 }
 
 func NewTask(oriFilePath string) (*Task, error) {
@@ -27,7 +28,7 @@ func NewTask(oriFilePath string) (*Task, error) {
 	tempFileName := fmt.Sprintf("%x-%s", md5.Sum([]byte(oriFilePath)), fileInfo.Name())
 	tempFilePath := path.Join(tempDirectory, tempFileName)
 
-	task := Task{oriFilePath, tempFilePath}
+	task := Task{oriFilePath, tempFilePath, false}
 	return &task, nil
 }
 
@@ -66,9 +67,17 @@ func (t *Task) Replace() error {
 	if _, err := io.Copy(dest, source); err != nil {
 		return err
 	}
+	t.replaced = true
 	return nil
 }
 
 func (t *Task) Cleanup() error {
 	return os.Remove(t.newFilePath)
+}
+
+func (t *Task) Filename() string {
+	if t.replaced {
+		return t.newFilePath
+	}
+	return t.oriFilePath
 }

@@ -8,9 +8,15 @@ import (
 	"path/filepath"
 	"regexp"
 
+	"github.com/leemiyinghao/go-av1/pkg/cache"
 	"github.com/leemiyinghao/go-av1/pkg/convert"
 	"github.com/leemiyinghao/go-av1/pkg/test_av1"
 )
+
+type Result struct {
+	task *convert.Task
+	err  error
+}
 
 func main() {
 	args := os.Args[1:]
@@ -30,6 +36,11 @@ func main() {
 	if err != nil {
 		panic("Regex compile failed.")
 	}
+
+	// Load cache
+	cachePath := "/tmp/go-av1-cache.json"
+	cache := cache.NewCache(cachePath)
+
 	err = filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			log.Fatalf("%s: %s", path, err)
@@ -39,9 +50,14 @@ func main() {
 			return nil
 		}
 
+		if cache.IsProcessed(path) {
+			return nil
+		}
+
 		skip, err := test_av1.Is_av1(ctx, path)
 		if skip {
 			log.Printf("Skip %s", path)
+			cache.AddProcessedFile(path)
 			return nil
 		}
 		if err != nil {
@@ -63,9 +79,9 @@ func main() {
 	}
 
 	log.Printf("Finish walk, %d tasks.", len(tasks))
-	errors := make(chan error)
+	results := make(chan Result)
 	for i := 0; i < 2; i++ {
-		go execute(inputs, errors)
+		go execute(inputs, results)
 	}
 	// push task into queue
 	go func() {
@@ -75,27 +91,32 @@ func main() {
 	}()
 	progressBar := progressbar.New(len(tasks))
 	for i := 0; i < len(tasks); i++ {
-		err := <-errors
+		result := <-results
 		progressBar.Add(1)
-		if err != nil {
+		if result.err != nil {
 			log.Printf("failed.")
+		} else {
+			cache.AddProcessedFile(result.task.Filename())
 		}
 	}
 }
 
-func execute(input chan *convert.Task, output chan error) {
+func execute(input chan *convert.Task, output chan Result) {
 	for true {
 		<-input
 		task := <-input
 		if err := task.Convert(); err != nil {
-			output <- err
+			output <- Result{task, err}
+			continue
 		}
 		if err := task.Replace(); err != nil {
-			output <- err
+			output <- Result{task, err}
+			continue
 		}
 		if err := task.Cleanup(); err != nil {
-			output <- err
+			output <- Result{task, err}
+			continue
 		}
-		output <- nil
+		output <- Result{task, nil}
 	}
 }
