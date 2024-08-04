@@ -76,8 +76,5 @@ func (t *Task) Cleanup() error {
 }
 
 func (t *Task) Filename() string {
-	if t.replaced {
-		return t.newFilePath
-	}
 	return t.oriFilePath
 }
