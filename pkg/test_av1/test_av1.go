@@ -12,7 +12,8 @@ func Is_av1(ctx context.Context, filePath string) (bool, error) {
 		log.Fatalf("ffprobe %s: %s\n", err, filePath)
 		return false, err
 	}
-	if data.GetFirstVideoStream().CodecName != "av1" {
+	stream := data.GetFirstVideoStream() 
+	if stream != nil && stream.CodecName != "av1" {
 		return false, nil
 	}
 	return true, nil
