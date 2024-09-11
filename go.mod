@@ -6,7 +6,6 @@ require (
 	github.com/schollz/progressbar v1.0.0
 	github.com/u2takey/ffmpeg-go v0.5.0
 	github.com/vansante/go-ffprobe v1.1.0
-	golang.org/x/sync v0.6.0
 )
 
 require (
