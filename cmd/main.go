@@ -8,39 +8,75 @@ import (
 	"path/filepath"
 	"regexp"
 
+	"github.com/leemiyinghao/go-av1/internal/runner"
 	"github.com/leemiyinghao/go-av1/pkg/cache"
 	"github.com/leemiyinghao/go-av1/pkg/convert"
 	"github.com/leemiyinghao/go-av1/pkg/test_av1"
 )
 
-type Result struct {
-	task *convert.Task
-	err  error
-}
-
 func main() {
 	args := os.Args[1:]
-	var path string
+	var pathes []string
 	if len(args) >= 1 {
-		path = args[0]
-		args = args[1:]
-		log.Printf("Scanning: %s...\n", path)
-		log.Print("This might take a while.\n")
+		pathes = args
 	} else {
 		panic("Missing path.")
 	}
 	ctx := context.Background()
-	var tasks []*convert.Task
-	inputs := make(chan *convert.Task)
-	fileTypeChecker, err := regexp.Compile(`.*\.(mp4|mkv|m4v|avi)`)
-	if err != nil {
-		panic("Regex compile failed.")
-	}
+	defer ctx.Done()
 
 	// Load cache
 	cachePath := "/tmp/go-av1-cache.json"
 	cache := cache.NewCache(cachePath)
+	var tasks []*convert.Task
 
+	for _, path := range pathes {
+		log.Printf("Start walk %s", path)
+		if new_tasks, err := walk(ctx, path, cache); err != nil {
+			log.Fatalf("%s", err)
+			panic("Path walk failed.")
+		} else {
+			tasks = append(tasks, new_tasks...)
+		}
+	}
+	log.Printf("Finish walk, %d tasks.", len(tasks))
+
+	results := make(chan runner.Result)
+
+	// Start CPU runner
+	cpuRunner := runner.NewCPURunner(1, results)
+	cpuRunner.Start(ctx)
+	// Start GPU runner
+	gpuRunner := runner.NewGPURunner(2, results, cpuRunner)
+	gpuRunner.Start(ctx)
+	cpuRunner.SetNextRunner(gpuRunner)
+
+	// push task into queue
+	go func() {
+		for _, task := range tasks {
+			gpuRunner.AddTask(task)
+		}
+	}()
+
+	progressBar := progressbar.New(len(tasks))
+	for i := 0; i < len(tasks); i++ {
+		result := <-results
+		log.Printf("Task %s Done", result.Task.Filename())
+		progressBar.Add(1)
+		if result.Err != nil {
+			log.Printf("failed.")
+		} else {
+			cache.AddProcessedFile(result.Task.Filename())
+		}
+	}
+}
+
+func walk(ctx context.Context, path string, cache *cache.Cache) ([]*convert.Task, error) {
+	var tasks []*convert.Task
+	fileTypeChecker, err := regexp.Compile(`.*\.(mp4|mkv|m4v|avi)`)
+	if err != nil {
+		return nil, err
+	}
 	err = filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			log.Fatalf("%s: %s", path, err)
@@ -73,49 +109,5 @@ func main() {
 
 		return nil
 	})
-	if err != nil {
-		log.Fatalf("%s", err)
-		panic("Path walk failed.")
-	}
-
-	log.Printf("Finish walk, %d tasks.", len(tasks))
-	results := make(chan Result)
-	for i := 0; i < 2; i++ {
-		go execute(inputs, results)
-	}
-	// push task into queue
-	go func() {
-		for _, task := range tasks {
-			inputs <- task
-		}
-	}()
-	progressBar := progressbar.New(len(tasks))
-	for i := 0; i < len(tasks); i++ {
-		result := <-results
-		progressBar.Add(1)
-		if result.err != nil {
-			log.Printf("failed.")
-		} else {
-			cache.AddProcessedFile(result.task.Filename())
-		}
-	}
-}
-
-func execute(input chan *convert.Task, output chan Result) {
-	for true {
-		task := <-input
-		if err := task.Convert(); err != nil {
-			output <- Result{task, err}
-			continue
-		}
-		if err := task.Replace(); err != nil {
-			output <- Result{task, err}
-			continue
-		}
-		if err := task.Cleanup(); err != nil {
-			output <- Result{task, err}
-			continue
-		}
-		output <- Result{task, nil}
-	}
+	return tasks, err
 }

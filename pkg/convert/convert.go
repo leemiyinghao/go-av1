@@ -5,13 +5,10 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"log"
 	"os"
 	"path"
-	"time"
 
 	"github.com/u2takey/ffmpeg-go"
-	"github.com/vansante/go-ffprobe"
 )
 
 type Task struct {
@@ -62,10 +59,45 @@ func NewTask(oriFilePath string) (*Task, error) {
 	return &task, nil
 }
 
+func (t *Task) ProcessCPU() error {
+	fmt.Printf("CPU Processing %s\n", t.oriFilePath)
+	if err := t.CPUConvert(); err != nil {
+		return err
+	}
+	if err := t.Replace(); err != nil {
+		return err
+	}
+	if err := t.Cleanup(); err != nil {
+		return err
+	}
+	fmt.Printf("CPU Done %s\n", t.oriFilePath)
+	return nil
+}
+
+func (t *Task) ProcessGPU() error {
+	fmt.Printf("GPU Processing %s\n", t.oriFilePath)
+	if err := t.GPUConvert(); err != nil {
+		return err
+	}
+	if err := t.Replace(); err != nil {
+		return err
+	}
+	if err := t.Cleanup(); err != nil {
+		return err
+	}
+	fmt.Printf("GPU Done %s\n", t.oriFilePath)
+	return nil
+}
+
+func (t *Task) Renew() {
+	t.oriFilePath = t.newFilePath
+	t.preprocessedFilePath = t.newFilePath
+	t.replaced = false
+}
 func (t *Task) CPUConvert() error {
 	err := ffmpeg_go.
 		Input(t.oriFilePath, ffmpeg_go.KwArgs{}).
-		Output(t.tmpFilePath, ffmpeg_go.KwArgs{"c:v": "libaom-av1", "crf": "28", "c:a": "copy", "threads": "4"}).
+		Output(t.tmpFilePath, ffmpeg_go.KwArgs{"c:v": "libx264", "crf": "28", "c:a": "copy"}).
 		OverWriteOutput().
 		Run()
 
@@ -82,28 +114,26 @@ func (t *Task) GPUConvert() error {
 	return err
 }
 
-func (t *Task) Convert() error {
+func (t *Task) PreprocessedConvert() error {
+	x264FilePath := fmt.Sprintf("x264.%s", t.tmpFilePath)
+	err := ffmpeg_go.
+		Input(t.oriFilePath, ffmpeg_go.KwArgs{}).
+		Output(x264FilePath, ffmpeg_go.KwArgs{"c:v": "libx264", "c:a": "copy"}).
+		OverWriteOutput().
+		Run()
 
-	data, err := ffprobe.GetProbeData(t.oriFilePath, 1*time.Second)
 	if err != nil {
-		log.Fatalf("ffprobe %s: %s\n", err, t.oriFilePath)
 		return err
 	}
-	stream := data.GetFirstVideoStream()
-	fmt.Printf("Processing %s, %s\n", t.oriFilePath, stream.CodecLongName)
-	fmt.Printf("Pixel format %s\n", stream.PixFmt)
+	err = ffmpeg_go.
+		Input(x264FilePath, t.inputKwArgs).
+		Output(t.tmpFilePath, t.outputKwArgs).
+		OverWriteOutput().
+		Run()
 
-	if err := t.GPUConvert(); err == nil {
-		return nil
-	}
+	os.Remove(x264FilePath)
 
-	log.Printf("GPU convert failed, fallback to CPU convert")
-	if err := t.CPUConvert(); err != nil {
-		log.Panicf("%s: %s", err, t.oriFilePath)
-		return err
-	}
-
-	return nil
+	return err
 }
 
 func (t *Task) Replace() error {
