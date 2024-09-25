@@ -65,10 +65,10 @@ func main() {
 			return nil
 		}
 
-		if task, err := convert.NewTask(path); err != nil {
+		if new_task, err := convert.NewTask(path); err != nil {
 			return err
 		} else {
-			tasks = append(tasks, task)
+			tasks = append(tasks, new_task)
 		}
 
 		return nil
