@@ -49,7 +49,6 @@ func main() {
 	// Start GPU runner
 	gpuRunner := runner.NewGPURunner(2, results, cpuRunner)
 	gpuRunner.Start(ctx)
-	cpuRunner.SetNextRunner(gpuRunner)
 
 	// push task into queue
 	go func() {
@@ -73,7 +72,7 @@ func main() {
 
 func walk(ctx context.Context, path string, cache *cache.Cache) ([]*convert.Task, error) {
 	var tasks []*convert.Task
-	fileTypeChecker, err := regexp.Compile(`.*\.(mp4|mkv|m4v|avi)`)
+	fileTypeChecker, err := regexp.Compile(`.*\.(mp4|mkv|m4v|avi|m2ts|webm|mp4v)`)
 	if err != nil {
 		return nil, err
 	}
@@ -92,12 +91,12 @@ func walk(ctx context.Context, path string, cache *cache.Cache) ([]*convert.Task
 
 		skip, err := test_av1.Is_av1(ctx, path)
 		if skip {
-			log.Printf("Skip %s", path)
+			log.Printf("Skip %s\n", path)
 			cache.AddProcessedFile(path)
 			return nil
 		}
 		if err != nil {
-			log.Fatalf("%s: %s", path, err)
+			log.Printf("%s: %s\n", path, err)
 			return nil
 		}
 

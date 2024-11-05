@@ -9,7 +9,7 @@ import (
 func Is_av1(ctx context.Context, filePath string) (bool, error) {
 	data, err := ffprobe.GetProbeDataContext(ctx, filePath)
 	if err != nil {
-		log.Fatalf("ffprobe %s: %s\n", err, filePath)
+		log.Printf("ffprobe %s: %s\n", err, filePath)
 		return false, err
 	}
 	stream := data.GetFirstVideoStream()

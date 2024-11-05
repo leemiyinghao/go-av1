@@ -52,10 +52,17 @@ func NewTask(oriFilePath string) (*Task, error) {
 	task := Task{oriFilePath, oriFilePath, tempFilePath, newFilePath, false, ffmpeg_go.KwArgs{
 		"hwaccel":               "vaapi",
 		"hwaccel_device":        "/dev/dri/renderD128",
-		"hwaccel_output_format": "vaapi"}, ffmpeg_go.KwArgs{
-		"c:v":            "av1_vaapi",
-		"global_quality": "100",
-		"c:a":            "copy"}}
+		"hwaccel_output_format": "vaapi",
+	},
+		ffmpeg_go.KwArgs{
+			"c:v":            "av1_vaapi",
+			"global_quality": "60",
+			"c:s":            "copy",
+			"c:a":            "copy",
+			"map:a":          "0:a?",
+			"map:s":          "0:s?",
+			"map:v":          "0:v:0",
+		}}
 	return &task, nil
 }
 
@@ -97,7 +104,16 @@ func (t *Task) Renew() {
 func (t *Task) CPUConvert() error {
 	err := ffmpeg_go.
 		Input(t.oriFilePath, ffmpeg_go.KwArgs{}).
-		Output(t.tmpFilePath, ffmpeg_go.KwArgs{"c:v": "libx264", "crf": "28", "c:a": "copy"}).
+		Output(t.tmpFilePath, ffmpeg_go.KwArgs{
+			"c:v":    "libsvtav1",
+			"crf":    "20",
+			"preset": "4",
+			"c:a":    "copy",
+			"c:s":    "copy",
+			"map:a":  "0:a?",
+			"map:s":  "0:s?",
+			"map:v":  "0:v:0",
+		}).
 		OverWriteOutput().
 		Run()
 
