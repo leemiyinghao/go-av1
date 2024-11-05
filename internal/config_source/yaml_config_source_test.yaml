@@ -1,0 +1,8 @@
+---
+- name: Test Task 1
+  command: echo "Hello World"
+  store: test_task_1
+- name: Test Task 2
+  command: echo "Hello World 2"
+  store: test_task_2
+  filter: some_store == "hi"
