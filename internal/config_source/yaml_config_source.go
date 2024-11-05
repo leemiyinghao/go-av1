@@ -9,7 +9,7 @@ import (
 type YamlConfigTask struct {
 	Name     string  `yaml:"name"`
 	Command  string  `yaml:"command"`
-	Filter   *string  `yaml:"filter" default:"nil"`
+	Filter   *string `yaml:"filter" default:"nil"`
 	StoreKey *string `yaml:"store_key" default:"nil"`
 }
 
@@ -47,6 +47,6 @@ func LoadYaml(configPath string) (*YamlConfigSource, error) {
 	}, nil
 }
 
-func (c *YamlConfigSource) GetActions() []ConfigTask {
+func (c *YamlConfigSource) GetTasks() []ConfigTask {
 	return c.Actions
 }

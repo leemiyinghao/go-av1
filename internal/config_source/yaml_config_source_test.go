@@ -19,7 +19,7 @@ func TestLoad(t *testing.T) {
 	var actions []ConfigTask
 	t.Run("TestGetActions", func(t *testing.T) {
 		// Get the actions
-		actions = configSource.GetActions()
+		actions = configSource.GetTasks()
 		assert.Equal(t, 2, len(actions))
 	})
 
