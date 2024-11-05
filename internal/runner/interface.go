@@ -7,7 +7,7 @@ import (
 type Task interface {
 	ProcessCPU() error
 	ProcessGPU() error
-		Filename() string
+	Filename() string
 	Renew()
 }
 
