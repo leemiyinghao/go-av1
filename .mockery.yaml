@@ -1,0 +1,8 @@
+all: true
+testonly: false
+with-expecter: true
+dir: mocks/{{ replaceAll .InterfaceDirRelative "internal" "internal_" }}
+packages:
+    github.com/leemiyinghao/go-av1/internal:
+        config:
+            recursive: true
