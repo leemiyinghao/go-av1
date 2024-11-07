@@ -4,7 +4,7 @@ package task
 
 import (
 	task "github.com/leemiyinghao/go-av1/internal/models/task"
-	task_type "github.com/leemiyinghao/go-av1/internal/models/task_type"
+	task_type "github.com/leemiyinghao/go-av1/internal/models/execution_type"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -214,18 +214,18 @@ func (_c *MockTask_GetTemplate_Call) RunAndReturn(run func() task.TaskTemplate) 
 }
 
 // GetType provides a mock function with given fields:
-func (_m *MockTask) GetType() task_type.TaskType {
+func (_m *MockTask) GetType() task_type.ExecutionType {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetType")
 	}
 
-	var r0 task_type.TaskType
-	if rf, ok := ret.Get(0).(func() task_type.TaskType); ok {
+	var r0 task_type.ExecutionType
+	if rf, ok := ret.Get(0).(func() task_type.ExecutionType); ok {
 		r0 = rf()
 	} else {
-		r0 = ret.Get(0).(task_type.TaskType)
+		r0 = ret.Get(0).(task_type.ExecutionType)
 	}
 
 	return r0
@@ -248,12 +248,12 @@ func (_c *MockTask_GetType_Call) Run(run func()) *MockTask_GetType_Call {
 	return _c
 }
 
-func (_c *MockTask_GetType_Call) Return(_a0 task_type.TaskType) *MockTask_GetType_Call {
+func (_c *MockTask_GetType_Call) Return(_a0 task_type.ExecutionType) *MockTask_GetType_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *MockTask_GetType_Call) RunAndReturn(run func() task_type.TaskType) *MockTask_GetType_Call {
+func (_c *MockTask_GetType_Call) RunAndReturn(run func() task_type.ExecutionType) *MockTask_GetType_Call {
 	_c.Call.Return(run)
 	return _c
 }

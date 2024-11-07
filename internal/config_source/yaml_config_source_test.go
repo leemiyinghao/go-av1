@@ -5,6 +5,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/leemiyinghao/go-av1/internal/models/execution_type"
+	"github.com/leemiyinghao/go-av1/internal/models/task_template"
 )
 
 func TestLoad(t *testing.T) {
@@ -16,52 +19,66 @@ func TestLoad(t *testing.T) {
 		assert.Nil(t, err)
 	})
 
-	var actions []ConfigTask
+	var taskTemplates []task_template.TaskTemplate
 	t.Run("TestGetActions", func(t *testing.T) {
 		// Get the actions
-		actions = configSource.GetTasks()
-		assert.Equal(t, 2, len(actions))
+		taskTemplates = configSource.GetTaskTemplates()
+		assert.Equal(t, 4, len(taskTemplates))
 	})
 
+	var task2Filter = `some_store == "hi"`
+
 	var condictions = []struct {
-		action       ConfigTask
-		context      map[string]interface{}
-		name         string
-		command      string
-		filterResult bool
-		storeKey     *string
+		got      task_template.TaskTemplate
+		expected task_template.TaskTemplate
 	}{
 		{
-			action:       actions[0],
-			context:      map[string]interface{}{},
-			name:         "Test Task 1",
-			command:      "echo \"Hello World\"",
-			filterResult: true,
-			storeKey:     nil,
+			got: taskTemplates[0],
+			expected: &task_template.ShellTaskTemplate{
+				BaseConfigTaskTemplate: task_template.BaseConfigTaskTemplate{
+					Name: "Test Task 1",
+				},
+				Command: "echo \"Hello World\"",
+			},
 		},
 		{
-			action:       actions[1],
-			context:      map[string]interface{}{},
-			name:         "Test Task 2",
-			command:      "echo \"Hello World 2\"",
-			filterResult: false,
-			storeKey:     nil,
+			got: taskTemplates[1],
+			expected: &task_template.ShellTaskTemplate{
+				BaseConfigTaskTemplate: task_template.BaseConfigTaskTemplate{
+					Name:   "Test Task 2",
+					Filter: &task2Filter,
+				},
+				Command: "echo \"Hello World 2\"",
+			},
 		},
 		{
-			action:       actions[1],
-			context:      map[string]interface{}{"some_store": "hi"},
-			name:         "Test Task 2",
-			command:      "echo \"Hello World 2\"",
-			filterResult: true,
-			storeKey:     nil,
+			got: taskTemplates[2],
+			expected: &task_template.FFmpegTaskTemplate{
+				BaseConfigTaskTemplate: task_template.BaseConfigTaskTemplate{
+					Name:          "Test FFMPEG Task 1",
+					ExecutionType: execution_type.GPU,
+				},
+				InputKwargs: map[string]string{
+					"hwaccel": "vaapi",
+				},
+				OutputKwargs: map[string]string{
+					"global_quality": "60",
+				},
+			},
+		},
+		{
+			got: taskTemplates[3],
+			expected: &task_template.FFmpegTaskTemplate{
+				BaseConfigTaskTemplate: task_template.BaseConfigTaskTemplate{
+					Name:          "Test FFMPEG Task 2",
+					ExecutionType: execution_type.CPU,
+				},
+			},
 		},
 	}
 	for _, condiction := range condictions {
-		t.Run(fmt.Sprintf("TestActionDetail: %v", condiction), func(t *testing.T) {
-			assert.Equal(t, condiction.name, condiction.action.Name)
-			assert.Equal(t, condiction.command, condiction.action.Command)
-			assert.Equal(t, condiction.filterResult, condiction.action.MatchFilter(condiction.context))
-			assert.Equal(t, condiction.storeKey, condiction.action.StoreKey)
+		t.Run(fmt.Sprintf("TestTaskTemplateDetail: %v", condiction), func(t *testing.T) {
+			assert.EqualValues(t, condiction.expected, condiction.got)
 		})
 	}
 }

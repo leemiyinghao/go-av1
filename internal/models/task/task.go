@@ -1,12 +1,12 @@
 package task
 
 import (
-	"github.com/leemiyinghao/go-av1/internal/models/task_type"
+	"github.com/leemiyinghao/go-av1/internal/models/execution_type"
 )
 
 type Task interface {
 	GetTemplate() TaskTemplate
-	GetType() task_type.TaskType
+	GetType() execution_type.ExecutionType
 	SetOriginalFilePath(string)
 	GetOriginalFilePath() string
 	GetOutputFilePath() string

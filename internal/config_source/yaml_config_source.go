@@ -4,17 +4,96 @@ import (
 	yaml "gopkg.in/yaml.v3"
 	"log"
 	"os"
+
+	"github.com/leemiyinghao/go-av1/internal/models/execution_type"
+	"github.com/leemiyinghao/go-av1/internal/models/task_template"
 )
 
-type YamlConfigTask struct {
-	Name     string  `yaml:"name"`
-	Command  string  `yaml:"command"`
-	Filter   *string `yaml:"filter" default:"nil"`
-	StoreKey *string `yaml:"store_key" default:"nil"`
+type YamlConfigSource struct {
+	TaskTemplates []task_template.TaskTemplate
 }
 
-type YamlConfigSource struct {
-	Actions []ConfigTask
+func (c *YamlConfigSource) GetTaskTemplates() []task_template.TaskTemplate {
+	return c.TaskTemplates
+}
+
+type RawTask struct {
+	TaskType string
+	*yaml.Node
+}
+
+func (r *RawTask) UnmarshalYAML(node *yaml.Node) error {
+	tmp := struct {
+		TaskType string `yaml:"task_type"`
+	}{}
+	if err := node.Decode(&tmp); err != nil {
+		return err
+	}
+	if tmp.TaskType == "" {
+		tmp.TaskType = "shell"
+	}
+	r.TaskType = tmp.TaskType
+	r.Node = node
+	return nil
+}
+
+type YamlTaskTemplateModel interface {
+	AsEntity() task_template.TaskTemplate
+}
+
+func stringToExecutionType(s string) execution_type.ExecutionType {
+	switch s {
+	default:
+		fallthrough
+	case "cpu":
+		return execution_type.CPU
+	case "gpu":
+		return execution_type.GPU
+	}
+}
+
+type YamlFFmpegTaskTemplateModel struct {
+	Name          string  `yaml:"name"`
+	ExecutionType string  `yaml:"execution_type",default:"cpu"`
+	Filter        *string `yaml:"filter",default:"nil"`
+	StoreKey      *string `yaml:"store_key",default:"nil"`
+	Kwargs        struct {
+		InputKwargs  map[string]string `yaml:"input"`
+		OutputKwargs map[string]string `yaml:"output"`
+	} `yaml:"kwargs"`
+}
+
+func (t *YamlFFmpegTaskTemplateModel) AsEntity() task_template.TaskTemplate {
+	return &task_template.FFmpegTaskTemplate{
+		BaseConfigTaskTemplate: task_template.BaseConfigTaskTemplate{
+			Name:          t.Name,
+			Filter:        t.Filter,
+			StoreKey:      t.StoreKey,
+			ExecutionType: stringToExecutionType(t.ExecutionType),
+		},
+		InputKwargs:  t.Kwargs.InputKwargs,
+		OutputKwargs: t.Kwargs.OutputKwargs,
+	}
+}
+
+type YamlShellTaskTemplateModel struct {
+	Name          string  `yaml:"name"`
+	ExecutionType string  `yaml:"execution_type",default:"cpu"`
+	Filter        *string `yaml:"filter", default:"nil"`
+	StoreKey      *string `yaml:"store_key", default:"nil"`
+	Command       string  `yaml:"command"`
+}
+
+func (t *YamlShellTaskTemplateModel) AsEntity() task_template.TaskTemplate {
+	return &task_template.ShellTaskTemplate{
+		BaseConfigTaskTemplate: task_template.BaseConfigTaskTemplate{
+			Name:          t.Name,
+			Filter:        t.Filter,
+			StoreKey:      t.StoreKey,
+			ExecutionType: stringToExecutionType(t.ExecutionType),
+		},
+		Command: t.Command,
+	}
 }
 
 func LoadYaml(configPath string) (*YamlConfigSource, error) {
@@ -26,27 +105,30 @@ func LoadYaml(configPath string) (*YamlConfigSource, error) {
 	}
 
 	// Unmarshal the data
-	var raw_tasks []YamlConfigTask
+	var raw_tasks []RawTask
 	err = yaml.Unmarshal(data, &raw_tasks)
 	if err != nil {
-		log.Printf("error: %v", err)
+		log.Panicf("error: %v", err)
 		return nil, err
 	}
-	var tasks []ConfigTask
+	var tasks []task_template.TaskTemplate
 	for _, raw_task := range raw_tasks {
-		tasks = append(tasks, ConfigTask{
-			Name:     raw_task.Name,
-			Command:  raw_task.Command,
-			Filter:   raw_task.Filter,
-			StoreKey: raw_task.StoreKey,
-		})
+		var task_template_model YamlTaskTemplateModel
+		switch raw_task.TaskType {
+		case "ffmpeg":
+			task_template_model = &YamlFFmpegTaskTemplateModel{}
+		case "shell":
+			task_template_model = &YamlShellTaskTemplateModel{}
+		default:
+			log.Panicf("error: unknown task type %v, %s", raw_task.TaskType, raw_task.Node.Value)
+		}
+		if err := raw_task.Node.Decode(task_template_model); err != nil {
+			log.Panicf("error: %v", err)
+		}
+		tasks = append(tasks, task_template_model.AsEntity())
 	}
 
 	return &YamlConfigSource{
-		Actions: tasks,
+		TaskTemplates: tasks,
 	}, nil
-}
-
-func (c *YamlConfigSource) GetTasks() []ConfigTask {
-	return c.Actions
 }
