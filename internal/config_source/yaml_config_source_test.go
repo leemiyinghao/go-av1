@@ -77,7 +77,7 @@ func TestLoad(t *testing.T) {
 		},
 	}
 	for _, condiction := range condictions {
-		t.Run(fmt.Sprintf("TestTaskTemplateDetail: %v", condiction), func(t *testing.T) {
+		t.Run(fmt.Sprintf("TestTaskTemplateDetail_%s", condiction.expected.GetName()), func(t *testing.T) {
 			assert.EqualValues(t, condiction.expected, condiction.got)
 		})
 	}
