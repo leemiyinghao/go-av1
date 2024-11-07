@@ -3,7 +3,7 @@
 package config_source
 
 import (
-	config_source "github.com/leemiyinghao/go-av1/internal/config_source"
+	task_template "github.com/leemiyinghao/go-av1/internal/models/task_template"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -21,19 +21,19 @@ func (_m *MockConfigSource) EXPECT() *MockConfigSource_Expecter {
 }
 
 // GetTaskTemplates provides a mock function with given fields:
-func (_m *MockConfigSource) GetTaskTemplates() []config_source.ConfigTaskTemplate {
+func (_m *MockConfigSource) GetTaskTemplates() []task_template.TaskTemplate {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetTaskTemplates")
 	}
 
-	var r0 []config_source.ConfigTaskTemplate
-	if rf, ok := ret.Get(0).(func() []config_source.ConfigTaskTemplate); ok {
+	var r0 []task_template.TaskTemplate
+	if rf, ok := ret.Get(0).(func() []task_template.TaskTemplate); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]config_source.ConfigTaskTemplate)
+			r0 = ret.Get(0).([]task_template.TaskTemplate)
 		}
 	}
 
@@ -57,12 +57,12 @@ func (_c *MockConfigSource_GetTaskTemplates_Call) Run(run func()) *MockConfigSou
 	return _c
 }
 
-func (_c *MockConfigSource_GetTaskTemplates_Call) Return(_a0 []config_source.ConfigTaskTemplate) *MockConfigSource_GetTaskTemplates_Call {
+func (_c *MockConfigSource_GetTaskTemplates_Call) Return(_a0 []task_template.TaskTemplate) *MockConfigSource_GetTaskTemplates_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *MockConfigSource_GetTaskTemplates_Call) RunAndReturn(run func() []config_source.ConfigTaskTemplate) *MockConfigSource_GetTaskTemplates_Call {
+func (_c *MockConfigSource_GetTaskTemplates_Call) RunAndReturn(run func() []task_template.TaskTemplate) *MockConfigSource_GetTaskTemplates_Call {
 	_c.Call.Return(run)
 	return _c
 }
