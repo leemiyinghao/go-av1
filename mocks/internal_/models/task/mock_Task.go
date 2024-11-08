@@ -168,19 +168,19 @@ func (_c *MockTask_GetOutputFilePath_Call) RunAndReturn(run func() string) *Mock
 }
 
 // GetTemplate provides a mock function with given fields:
-func (_m *MockTask) GetTemplate() task.TaskTemplate {
+func (_m *MockTask) GetTemplate() task.TaskFlow {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetTemplate")
 	}
 
-	var r0 task.TaskTemplate
-	if rf, ok := ret.Get(0).(func() task.TaskTemplate); ok {
+	var r0 task.TaskFlow
+	if rf, ok := ret.Get(0).(func() task.TaskFlow); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(task.TaskTemplate)
+			r0 = ret.Get(0).(task.TaskFlow)
 		}
 	}
 
@@ -204,12 +204,12 @@ func (_c *MockTask_GetTemplate_Call) Run(run func()) *MockTask_GetTemplate_Call 
 	return _c
 }
 
-func (_c *MockTask_GetTemplate_Call) Return(_a0 task.TaskTemplate) *MockTask_GetTemplate_Call {
+func (_c *MockTask_GetTemplate_Call) Return(_a0 task.TaskFlow) *MockTask_GetTemplate_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *MockTask_GetTemplate_Call) RunAndReturn(run func() task.TaskTemplate) *MockTask_GetTemplate_Call {
+func (_c *MockTask_GetTemplate_Call) RunAndReturn(run func() task.TaskFlow) *MockTask_GetTemplate_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -5,7 +5,7 @@ import (
 )
 
 type Task interface {
-	GetTemplate() TaskTemplate
+	GetFlow() TaskFlow
 	GetType() execution_type.ExecutionType
 	SetOriginalFilePath(string)
 	GetOriginalFilePath() string
@@ -13,7 +13,7 @@ type Task interface {
 	Execute() (string, error)
 }
 
-type TaskTemplate interface {
+type TaskFlow interface {
 	GenerateNext() Task
 	Reset()
 }

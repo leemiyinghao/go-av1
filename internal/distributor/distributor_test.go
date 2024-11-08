@@ -38,7 +38,7 @@ func TestDistributor_AddTask(t *testing.T) {
 
 	d := NewDistributor(runners, 1024)
 	d.Start()
-	d.AddTaskTemplate(taskTemplate)
+	d.AddTaskFlow(taskTemplate)
 	d.output_queue <- task
 	d.Wait()
 

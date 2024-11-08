@@ -46,19 +46,19 @@ func (d *Distributor) receiveResult() (t task.Task) {
 func (d *Distributor) rotateResult() {
 	for {
 		current := d.receiveResult()
-		var template task.TaskTemplate
+		var flow task.TaskFlow
 		var next task.Task
-		if template = current.GetTemplate(); template == nil {
+		if flow = current.GetFlow(); flow == nil {
 			return
 		}
-		if next = template.GenerateNext(); next == nil {
+		if next = flow.GenerateNext(); next == nil {
 			return
 		}
 		d.addTask(next)
 	}
 }
 
-func (d *Distributor) AddTaskTemplate(tt task.TaskTemplate) {
+func (d *Distributor) AddTaskFlow(tt task.TaskFlow) {
 	task := tt.GenerateNext()
 	if task != nil {
 		d.addTask(task)
