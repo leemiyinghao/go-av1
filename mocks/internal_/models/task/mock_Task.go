@@ -77,6 +77,53 @@ func (_c *MockTask_Execute_Call) RunAndReturn(run func() (string, error)) *MockT
 	return _c
 }
 
+// GetFlow provides a mock function with given fields:
+func (_m *MockTask) GetFlow() task.TaskFlow {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetFlow")
+	}
+
+	var r0 task.TaskFlow
+	if rf, ok := ret.Get(0).(func() task.TaskFlow); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(task.TaskFlow)
+		}
+	}
+
+	return r0
+}
+
+// MockTask_GetFlow_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetFlow'
+type MockTask_GetFlow_Call struct {
+	*mock.Call
+}
+
+// GetFlow is a helper method to define mock.On call
+func (_e *MockTask_Expecter) GetFlow() *MockTask_GetFlow_Call {
+	return &MockTask_GetFlow_Call{Call: _e.mock.On("GetFlow")}
+}
+
+func (_c *MockTask_GetFlow_Call) Run(run func()) *MockTask_GetFlow_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *MockTask_GetFlow_Call) Return(_a0 task.TaskFlow) *MockTask_GetFlow_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockTask_GetFlow_Call) RunAndReturn(run func() task.TaskFlow) *MockTask_GetFlow_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetOriginalFilePath provides a mock function with given fields:
 func (_m *MockTask) GetOriginalFilePath() string {
 	ret := _m.Called()
@@ -163,53 +210,6 @@ func (_c *MockTask_GetOutputFilePath_Call) Return(_a0 string) *MockTask_GetOutpu
 }
 
 func (_c *MockTask_GetOutputFilePath_Call) RunAndReturn(run func() string) *MockTask_GetOutputFilePath_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetTemplate provides a mock function with given fields:
-func (_m *MockTask) GetTemplate() task.TaskFlow {
-	ret := _m.Called()
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetTemplate")
-	}
-
-	var r0 task.TaskFlow
-	if rf, ok := ret.Get(0).(func() task.TaskFlow); ok {
-		r0 = rf()
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(task.TaskFlow)
-		}
-	}
-
-	return r0
-}
-
-// MockTask_GetTemplate_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetTemplate'
-type MockTask_GetTemplate_Call struct {
-	*mock.Call
-}
-
-// GetTemplate is a helper method to define mock.On call
-func (_e *MockTask_Expecter) GetTemplate() *MockTask_GetTemplate_Call {
-	return &MockTask_GetTemplate_Call{Call: _e.mock.On("GetTemplate")}
-}
-
-func (_c *MockTask_GetTemplate_Call) Run(run func()) *MockTask_GetTemplate_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run()
-	})
-	return _c
-}
-
-func (_c *MockTask_GetTemplate_Call) Return(_a0 task.TaskFlow) *MockTask_GetTemplate_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *MockTask_GetTemplate_Call) RunAndReturn(run func() task.TaskFlow) *MockTask_GetTemplate_Call {
 	_c.Call.Return(run)
 	return _c
 }

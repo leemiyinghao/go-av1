@@ -8,10 +8,11 @@ import (
 
 	"github.com/leemiyinghao/go-av1/internal/models/execution_type"
 	"github.com/leemiyinghao/go-av1/internal/models/task_template"
+	"github.com/leemiyinghao/go-av1/internal/models/config_source"
 )
 
 func TestLoad(t *testing.T) {
-	var configSource ConfigSource
+	var configSource config_source.ConfigSource
 	// Read the file and unmarshal the data
 	t.Run("TestLoad", func(t *testing.T) {
 		var err error

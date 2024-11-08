@@ -4,7 +4,7 @@ import (
 	"sync"
 
 	"github.com/leemiyinghao/go-av1/internal/models/task"
-	"github.com/leemiyinghao/go-av1/internal/runner"
+	"github.com/leemiyinghao/go-av1/internal/models/runner"
 )
 
 type Distributor struct {
