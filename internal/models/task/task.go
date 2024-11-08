@@ -7,10 +7,9 @@ import (
 type Task interface {
 	GetFlow() TaskFlow
 	GetType() execution_type.ExecutionType
-	SetOriginalFilePath(string)
 	GetOriginalFilePath() string
 	GetOutputFilePath() string
-	Execute() (string, error)
+	Execute() (int, error)
 }
 
 type TaskFlow interface {

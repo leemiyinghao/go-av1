@@ -23,22 +23,22 @@ func (_m *MockTask) EXPECT() *MockTask_Expecter {
 }
 
 // Execute provides a mock function with given fields:
-func (_m *MockTask) Execute() (string, error) {
+func (_m *MockTask) Execute() (int, error) {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for Execute")
 	}
 
-	var r0 string
+	var r0 int
 	var r1 error
-	if rf, ok := ret.Get(0).(func() (string, error)); ok {
+	if rf, ok := ret.Get(0).(func() (int, error)); ok {
 		return rf()
 	}
-	if rf, ok := ret.Get(0).(func() string); ok {
+	if rf, ok := ret.Get(0).(func() int); ok {
 		r0 = rf()
 	} else {
-		r0 = ret.Get(0).(string)
+		r0 = ret.Get(0).(int)
 	}
 
 	if rf, ok := ret.Get(1).(func() error); ok {
@@ -67,12 +67,12 @@ func (_c *MockTask_Execute_Call) Run(run func()) *MockTask_Execute_Call {
 	return _c
 }
 
-func (_c *MockTask_Execute_Call) Return(_a0 string, _a1 error) *MockTask_Execute_Call {
+func (_c *MockTask_Execute_Call) Return(_a0 int, _a1 error) *MockTask_Execute_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockTask_Execute_Call) RunAndReturn(run func() (string, error)) *MockTask_Execute_Call {
+func (_c *MockTask_Execute_Call) RunAndReturn(run func() (int, error)) *MockTask_Execute_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -255,39 +255,6 @@ func (_c *MockTask_GetType_Call) Return(_a0 execution_type.ExecutionType) *MockT
 }
 
 func (_c *MockTask_GetType_Call) RunAndReturn(run func() execution_type.ExecutionType) *MockTask_GetType_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// SetOriginalFilePath provides a mock function with given fields: _a0
-func (_m *MockTask) SetOriginalFilePath(_a0 string) {
-	_m.Called(_a0)
-}
-
-// MockTask_SetOriginalFilePath_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetOriginalFilePath'
-type MockTask_SetOriginalFilePath_Call struct {
-	*mock.Call
-}
-
-// SetOriginalFilePath is a helper method to define mock.On call
-//   - _a0 string
-func (_e *MockTask_Expecter) SetOriginalFilePath(_a0 interface{}) *MockTask_SetOriginalFilePath_Call {
-	return &MockTask_SetOriginalFilePath_Call{Call: _e.mock.On("SetOriginalFilePath", _a0)}
-}
-
-func (_c *MockTask_SetOriginalFilePath_Call) Run(run func(_a0 string)) *MockTask_SetOriginalFilePath_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
-	})
-	return _c
-}
-
-func (_c *MockTask_SetOriginalFilePath_Call) Return() *MockTask_SetOriginalFilePath_Call {
-	_c.Call.Return()
-	return _c
-}
-
-func (_c *MockTask_SetOriginalFilePath_Call) RunAndReturn(run func(string)) *MockTask_SetOriginalFilePath_Call {
 	_c.Call.Return(run)
 	return _c
 }

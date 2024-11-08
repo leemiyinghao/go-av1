@@ -7,6 +7,8 @@ import (
 
 	"github.com/leemiyinghao/go-av1/internal/models/execution_type"
 	"github.com/leemiyinghao/go-av1/internal/models/task_template"
+	"github.com/leemiyinghao/go-av1/internal/service/ffmpeg_task"
+	"github.com/leemiyinghao/go-av1/internal/service/shell_task"
 )
 
 type YamlConfigSource struct {
@@ -64,16 +66,14 @@ type YamlFFmpegTaskTemplateModel struct {
 }
 
 func (t *YamlFFmpegTaskTemplateModel) AsEntity() task_template.TaskTemplate {
-	return &task_template.FFmpegTaskTemplate{
-		BaseConfigTaskTemplate: task_template.BaseConfigTaskTemplate{
-			Name:          t.Name,
-			Filter:        t.Filter,
-			StoreKey:      t.StoreKey,
-			ExecutionType: stringToExecutionType(t.ExecutionType),
-		},
-		InputKwargs:  t.Kwargs.InputKwargs,
-		OutputKwargs: t.Kwargs.OutputKwargs,
-	}
+	return ffmpeg_task.NewFFmpegTaskTemplate(
+		t.Name,
+		t.StoreKey,
+		t.Filter,
+		stringToExecutionType(t.ExecutionType),
+		t.Kwargs.InputKwargs,
+		t.Kwargs.OutputKwargs,
+	)
 }
 
 type YamlShellTaskTemplateModel struct {
@@ -85,15 +85,13 @@ type YamlShellTaskTemplateModel struct {
 }
 
 func (t *YamlShellTaskTemplateModel) AsEntity() task_template.TaskTemplate {
-	return &task_template.ShellTaskTemplate{
-		BaseConfigTaskTemplate: task_template.BaseConfigTaskTemplate{
-			Name:          t.Name,
-			Filter:        t.Filter,
-			StoreKey:      t.StoreKey,
-			ExecutionType: stringToExecutionType(t.ExecutionType),
-		},
-		Command: t.Command,
-	}
+	return shell_task.NewShellTaskTemplate(
+		t.Name,
+		t.StoreKey,
+		t.Filter,
+		stringToExecutionType(t.ExecutionType),
+		t.Command,
+	)
 }
 
 func LoadYaml(configPath string) (*YamlConfigSource, error) {
