@@ -1,0 +1,22 @@
+---
+tasks:
+  - name: Test Task 1
+    command: echo "Hello World"
+    store_key: test_task_1
+  - name: Test Task 2
+    execution_type: cpu
+    task_type: shell
+    command: echo "Hello World 2"
+    store_key: test_task_2
+    filter: some_store == "hi"
+  - name: Test FFMPEG Task 1
+    execution_type: gpu
+    task_type: ffmpeg
+    kwargs:
+      input:
+        hwaccel: "vaapi"
+      output:
+        "c:v": "libx264"
+  - name: Test FFMPEG Task 2
+    execution_type: cpu
+    task_type: ffmpeg
