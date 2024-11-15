@@ -13,3 +13,17 @@ tasks:
       - go test "./..." -v -coverprofile cover.out
       - gcov2lcov -infile cover.out -outfile lcov.info
       - rm cover.out
+  gen-mock:
+    desc: Generate mocks
+    deps:
+      - install-deps
+    cmds:
+      - cmd: rm -r mocks
+        ignore_error: true
+      - mockery
+  build:
+    desc: Build the binary
+    deps:
+      - install-deps
+    cmds:
+      - go build -o bin/go-av1 cmd/go-av1/main.go
