@@ -1,0 +1,112 @@
+#+TITLE: Go-AV1
+#+AUTHOR: catLee
+#+EMAIL: leemiyinghao@gmx.com
+* Introduction
+
+Go-AV1 is a tool for automating video processing tasks. It uses YAML
+configuration files to define tasks and their dependencies.
+
+* Features
+
+- Go-AV1 supports two types of tasks:
+  - Shell tasks, which run arbitrary shell commands.
+  - FFmpeg tasks, which use the FFmpeg library to perform video
+    encoding and decoding operations.
+- Go-AV1 can filter tasks based on custom conditions defined in the
+  YAML configuration file.
+- Go-AV1 has a modular design, with separate packages for task
+  execution, filtering, and configuration management.
+
+* Usage
+
+To use Go-AV1, create a YAML configuration file that defines your
+tasks and their dependencies. Then, run go-av1 with the path to the
+configuration file as an argument.
+
+By placing the configuration file in the root directory of your media
+library, you can easily manage and automate video processing tasks.
+
+#+begin_src text
+  some_directory/
+   ├─ .go-av1.yml
+   ├─ some_file.txt
+   ├─ some_other_file.txt
+   └─ some_other_directory/
+     ├─ some_other_file.txt
+     └─ some_other_other_file.txt
+#+end_src
+
+Run go-av1 with the following command:
+
+#+begin_src sh
+  go-av1 some_directory/
+#+end_src
+
+* Configuration File Format
+
+The configuration file is written in YAML and has the following structure:
+
+#+begin_src yaml
+  tasks:
+    - name: Test GPU Convert
+      execution_type: gpu
+      task_type: ffmpeg
+      store_key: test_gpu
+      ignored_codecs:
+        - "vp9"
+      kwargs:
+        input:
+          hwaccel: "vaapi"
+          hwaccel_device: "/dev/dri/renderD128"
+          hwaccel_output_format: "vaapi"
+        output:
+          "c:v": "av1_vaapi"
+          "global_quality": "80"
+          "c:s": "copy"
+          "c:a": "copy"
+          "map:a": "0:a?"
+          "map:s": "0:s?"
+          "map:v": "0:v:0"
+    - name: Test CPU Convert
+      execution_type: cpu
+      task_type: ffmpeg
+      store_key: test_cpu
+      filter: test_gpu != "0"
+      kwargs:
+        output:
+          "c:v": "libsvtav1"
+          "crf": "20"
+          "c:s": "copy"
+          "c:a": "copy"
+          "map:a": "0:a?"
+          "map:s": "0:s?"
+          "map:v": "0:v:0"
+#+end_src
+
+The example file address a very basic usage. It defines two convert
+tasks, one for GPU and one for CPU. The GPU task uses the vaapi
+hardware acceleration, while the CPU task uses the libsvtav1 software
+encoder. The CPU task will only be executed if the GPU task fails.
+
+
+* Install
+
+To install Go-AV1, run the following command:
+
+#+begin_src sh
+  go install github.com/leemiyinghao/go-av1
+#+end_src
+
+* Contributing
+
+Contributions are welcome! Please submit pull requests or issues to
+the GitHub repository. I might not be able to read them very often,
+but I promise I would!
+
+* Fun Fact
+
+This project was used as a part of my personal media system, but
+somehow I found it might also be possible to replace by simple go-task
+Taskfile after I finish it...
+
+Anyway, it is a good practice for me to learn how to write a good.
