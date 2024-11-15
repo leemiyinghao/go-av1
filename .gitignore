@@ -1,2 +1,4 @@
 .aider*
 .env
+lcov.info
+.DS_Store
