@@ -1,0 +1,15 @@
+version: "3"
+
+tasks:
+  install-deps:
+    desc: Install dependencies
+    cmds:
+      - go mod tidy
+  test:
+    desc: Run tests
+    deps:
+      - install-deps
+    cmds:
+      - go test "./..." -v -coverprofile cover.out
+      - gcov2lcov -infile cover.out -outfile lcov.info
+      - rm cover.out
