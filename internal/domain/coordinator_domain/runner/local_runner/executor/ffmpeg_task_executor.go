@@ -35,7 +35,7 @@ func RunFFmpegTask(task *task_flow.FFmpegTask, file string) (*string, *string, e
 	if err != nil {
 		return ptr.To("1"), ptr.To(file), err
 	}
-	ignore, err := ignoredCodec(file, task.IgnoreCodecs)
+	ignore, err := ignoredCodec(file, task.IgnoredCodecs)
 	if err != nil {
 		return ptr.To("1"), ptr.To(file), err
 	}

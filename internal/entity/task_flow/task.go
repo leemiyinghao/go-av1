@@ -68,7 +68,7 @@ type FFmpegTask struct {
 	*BaseTask
 	InputKwargs  map[string]string
 	OutputKwargs map[string]string
-	IgnoreCodecs []string
+	IgnoredCodecs []string
 }
 
 func NewFFmpegTask(
@@ -78,8 +78,11 @@ func NewFFmpegTask(
 	storeKey *string,
 	inputKwargs map[string]string,
 	outputKwargs map[string]string,
-	ignoreCodecs []string,
+	ignoredCodecs []string,
 ) *FFmpegTask {
+	if ignoredCodecs == nil {
+		ignoredCodecs = []string{}
+	}
 	return &FFmpegTask{
 		&BaseTask{
 			Name:          name,
@@ -89,7 +92,7 @@ func NewFFmpegTask(
 		},
 		inputKwargs,
 		outputKwargs,
-		ignoreCodecs,
+		ignoredCodecs,
 	}
 }
 

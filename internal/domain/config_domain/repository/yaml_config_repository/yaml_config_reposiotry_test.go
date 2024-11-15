@@ -95,7 +95,7 @@ func TestGetYamlConfig(t *testing.T) {
 					nil,
 					map[string]string{"hwaccel": "vaapi"},
 					map[string]string{"c:v": "libx264"},
-					[]string{},
+					[]string{"vp9"},
 				),
 				task_flow.NewFFmpegTask(
 					"Test FFMPEG Task 2",
@@ -104,7 +104,7 @@ func TestGetYamlConfig(t *testing.T) {
 					nil,
 					nil,
 					nil,
-					[]string{},
+					nil,
 				),
 			},
 			wantErr: nil,

@@ -12,6 +12,7 @@ type YamlFFmpegTaskTemplateDto struct {
 	ExecutionType string                  `yaml:"execution_type"  default:"cpu"`
 	Filter        *task_filter.TaskFilter `yaml:"filter" default:"nil"`
 	StoreKey      *string                 `yaml:"store_key" default:"nil"`
+	IgnoredCodecs []string                `yaml:"ignored_codecs"`
 	Kwargs        struct {
 		InputKwargs  map[string]string `yaml:"input"`
 		OutputKwargs map[string]string `yaml:"output"`
@@ -26,7 +27,6 @@ func (y *YamlFFmpegTaskTemplateDto) AsTask() task_flow.Task {
 		y.StoreKey,
 		y.Kwargs.InputKwargs,
 		y.Kwargs.OutputKwargs,
-		// TODO: implement ignoreCodecs
-		[]string{},
+		y.IgnoredCodecs,
 	)
 }

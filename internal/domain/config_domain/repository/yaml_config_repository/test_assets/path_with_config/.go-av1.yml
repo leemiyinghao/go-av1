@@ -12,6 +12,8 @@ tasks:
   - name: Test FFMPEG Task 1
     execution_type: gpu
     task_type: ffmpeg
+    ignored_codecs:
+      - "vp9"
     kwargs:
       input:
         hwaccel: "vaapi"
